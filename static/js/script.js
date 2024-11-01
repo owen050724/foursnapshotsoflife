@@ -1,5 +1,7 @@
+let photoCount = 0;
+
 const camera = document.getElementById('camera');
-const photo = document.getElementById('photo');
+const photoGallery = document.getElementById('photoGallery');
 const captureButton = document.getElementById('captureButton');
 
 // Get access to the user's camera
@@ -13,11 +15,28 @@ navigator.mediaDevices.getUserMedia({ video: true })
 
 // Capture photo from the video stream
 captureButton.addEventListener('click', () => {
+    const photo = document.createElement('canvas');
     const context = photo.getContext('2d');
     photo.width = camera.videoWidth;
     photo.height = camera.videoHeight;
     context.drawImage(camera, 0, 0, photo.width, photo.height);
 
-    // Display the captured image
-    photo.style.display = 'block';
+    // Add photo to gallery
+    photoCount++;
+    const photoContainer = document.createElement('div');
+    photoContainer.classList.add('photo-container');
+
+    const img = document.createElement('img');
+    img.src = photo.toDataURL('image/png');
+    img.classList.add('photo');
+    photoContainer.appendChild(img);
+
+    const downloadButton = document.createElement('a');
+    downloadButton.textContent = 'Download Photo';
+    downloadButton.href = photo.toDataURL('image/png');
+    downloadButton.download = `photo_${photoCount}.png`;
+    downloadButton.classList.add('download-button');
+    photoContainer.appendChild(downloadButton);
+
+    photoGallery.appendChild(photoContainer);
 });

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,11 +7,14 @@
     <link rel="stylesheet" href="../static/css/style.css">
 </head>
 <body>
-    <h1>Photo Capture</h1>
-    <video id="camera" autoplay></video>
-    <canvas id="photo" style="display:none;"></canvas>
-    <div id="controls">
-        <button id="captureButton">Capture Photo</button>
+    <div class="container">
+        <div id="cameraContainer">
+            <video id="camera" autoplay></video>
+        </div>
+        <div id="controls">
+            <button id="captureButton" class="capture-button"></button>
+        </div>
+        <div id="photoGallery"></div>
     </div>
     <script src="../static/js/script.js"></script>
 </body>
