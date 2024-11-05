@@ -10,6 +10,9 @@ const frameElements = [
 const camera = document.getElementById('camera');
 const photoGallery = document.getElementById('photoGallery');
 const captureButton = document.getElementById('captureButton');
+const sendButton = document.getElementById('sendButton');
+
+const selectedImages = [null, null, null, null];
 
 // Show alert message before starting
 alert('최대 8장의 사진을 촬영할 수 있으며 그 중 4장을 골라주세요.');
@@ -26,7 +29,7 @@ navigator.mediaDevices.getUserMedia({ video: true })
 // Capture photo from the video stream
 captureButton.addEventListener('click', () => {
     if (photoCount >= 8) {
-        alert('최대 8장의 사진만 촬영 가능합니다.');
+        alert('You can only capture up to 8 photos.');
         return;
     }
 
@@ -57,6 +60,7 @@ captureButton.addEventListener('click', () => {
     selectButton.textContent = 'Select Photo';
     selectButton.classList.add('select-button');
     selectButton.addEventListener('click', () => {
+        selectedImages[frameIndex] = img.src;
         frameElements[frameIndex].style.backgroundImage = `url(${img.src})`;
         frameElements[frameIndex].style.backgroundSize = 'contain';
         frameElements[frameIndex].style.backgroundRepeat = 'no-repeat';
@@ -67,3 +71,40 @@ captureButton.addEventListener('click', () => {
 
     photoGallery.appendChild(photoContainer);
 });
+
+// Send selected photos to the server
+sendButton.addEventListener('click', () => {
+    alert("image sent!");
+    const formData = new FormData();
+    selectedImages.forEach((image, index) => {
+        if (image) {
+            const blob = dataURLtoBlob(image);
+            formData.append(`photo${index + 1}`, blob, `photo${index + 1}.png`);
+        }
+    });
+
+    // Send the selected photos to the server via POST request
+    fetch('/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Photos uploaded successfully:', data);
+    })
+    .catch(error => {
+        console.error('Error uploading photos:', error);
+    });
+});
+
+// Helper function to convert dataURL to Blob
+function dataURLtoBlob(dataURL) {
+    const byteString = atob(dataURL.split(',')[1]);
+    const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: mimeString });
+}
